@@ -47,7 +47,7 @@ public class DatabaseModification {
                 "Alex", "Charlie", "Skyler", "Armani", "Salem", "Sidney", "Denver",
                 "Robin", "Campbell", "Yael", "Ramsey", "Murphy", "Perry", "Hollis",
                 "Jules", "Austin", "Dominique", "Reilly", "Kylar", "Austen", "Storm",
-                "Ocean", "Summer", "Winter", "Spring", "Autumn", "Indiana", "Indianna",
+                "Ocean", "Summer", "Winter", "Spring", "Autumn", "Indiana", "Nano",
                 "Marlo", "Ridley", "Ryley", "Riley", "Jaden", "Jayden", "Jackie", "Taylor",
                 "Taylen", "Lake", "Timber", "Cypress", "Jaziah", "Eastyn", "Easton",
                 "Payson", "Kylin", "Hollis", "Holis", "Angel", "Blake", "Ruby", "Evan",
@@ -78,9 +78,9 @@ public class DatabaseModification {
             //remove classes
             rset = stmt.executeQuery("SELECT * FROM student.classes");
             while (rset.next()){
-                classIDSeed = rset.getInt("courseID");
+                classIDSeed = rset.getInt("classCode");
                 PreparedStatement p = conn.prepareStatement("DELETE FROM `student`.`classes` WHERE " +
-                        "(`classID` = '" + classIDSeed + "');");
+                        "(`classCode` = '" + classIDSeed + "');");
                 p.executeUpdate();
             }
             //add physics courses
@@ -91,7 +91,7 @@ public class DatabaseModification {
             for (int i=0; i<physicsClasses.length; i++){
                 PreparedStatement p = conn.prepareStatement("INSERT INTO student.courses " +
                         "(courseID, courseTitle, department) VALUES " +
-                        "('" + courseIDSeed + n + "', '" + physicsClasses[i] + "', 'Physics');");
+                        "('" + (courseIDSeed + n) + "', '" + physicsClasses[i] + "', 'Physics');");
                 n++;
                 p.executeUpdate();
             }
@@ -103,7 +103,7 @@ public class DatabaseModification {
             for (int i=0; i<historyClasses.length; i++){
                 PreparedStatement p = conn.prepareStatement("INSERT INTO student.courses " +
                         "(courseID, courseTitle, department) VALUES " +
-                        "('" + courseIDSeed + n + "', '" + historyClasses[i] + "', 'History');");
+                        "('" + (courseIDSeed + n) + "', '" + historyClasses[i] + "', 'History');");
                 n++;
                 p.executeUpdate();
             }
@@ -115,7 +115,7 @@ public class DatabaseModification {
             for (int i=0; i<mathClasses.length; i++){
                 PreparedStatement p = conn.prepareStatement("INSERT INTO student.courses " +
                         "(courseID, courseTitle, department) VALUES " +
-                        "('" + courseIDSeed + n + "', '" + mathClasses[i] + "', 'Mathematics');");
+                        "('" + (courseIDSeed + n) + "', '" + mathClasses[i] + "', 'Mathematics');");
                 n++;
                 p.executeUpdate();
             }
@@ -127,7 +127,7 @@ public class DatabaseModification {
             for (int i=0; i<computerScienceClasses.length; i++){
                 PreparedStatement p = conn.prepareStatement("INSERT INTO student.courses " +
                         "(courseID, courseTitle, department) VALUES " +
-                        "('" + courseIDSeed + n + "', '" + computerScienceClasses[i] + "', 'Computer Science');");
+                        "('" + (courseIDSeed + n) + "', '" + computerScienceClasses[i] + "', 'Computer Science');");
                 n++;
                 p.executeUpdate();
             }
@@ -145,21 +145,51 @@ public class DatabaseModification {
                 }
                 PreparedStatement p = conn.prepareStatement("INSERT INTO student.students " +
                         "(firstName, lastName, studentID, sex) VALUES " +
-                        "('" + firstName + "', '" + lastName + "', '" + studentIDSeed + i + "', '" + gender + "');");
+                        "('" + firstName + "', '" + lastName + "', '" + (studentIDSeed + i) + "', '" + gender + "');");
                 p.executeUpdate();
             }
             PreparedStatement p = conn.prepareStatement("INSERT INTO student.students " +
                     "(firstName, lastName, studentID, sex) VALUES " +
-                    "('Hashem', 'Auda', '" + studentIDSeed + 27 + "', 'M');");
+                    "('Hashem', 'Auda', '" + (studentIDSeed + 27) + "', 'M');");
             p.executeUpdate();
             p = conn.prepareStatement("INSERT INTO student.students " +
                     "(firstName, lastName, studentID, sex) VALUES " +
-                    "('Ravid', 'Rahman', '" + studentIDSeed + 28 + "', 'M');");
+                    "('Ravid', 'Rahman', '" + (studentIDSeed + 28) + "', 'M');");
             p.executeUpdate();
             p = conn.prepareStatement("INSERT INTO student.students " +
                     "(firstName, lastName, studentID, sex) VALUES " +
-                    "('Kenneth', 'Feng', '" + studentIDSeed + 29 + "', 'M');");
+                    "('Kenneth', 'Feng', '" + (studentIDSeed + 29) + "', 'M');");
             p.executeUpdate();
+            //add classes
+            classIDSeed = (rand.nextInt(50) + 10) * 10;
+            for(int i=0; i<30; i++){
+                char GPA;
+                int randGPA = rand.nextInt(6);
+                switch(randGPA){
+                    case 1:
+                        GPA = 'A';
+                        break;
+                    case 2:
+                        GPA = 'B';
+                        break;
+                    case 3:
+                        GPA = 'C';
+                        break;
+                    case 4:
+                        GPA = 'D';
+                        break;
+                    case 5:
+                        GPA = 'F';
+                        break;
+                    default:
+                        GPA = 'W';
+                }
+                p = conn.prepareStatement("INSERT INTO student.classes " +
+                        "(classCode, courseID, studentID, year, semester, GPA) VALUES " +
+                        "('" + (classIDSeed + i) + "', '" + courseIDSeed + "', '" + studentIDSeed + i + "', '"
+                        + 2019 + "', 'Fall', '" + GPA + "');");
+                p.executeUpdate();
+            }
         }catch(SQLException ex) {
             System.out.println("SQLException: " + ex.getMessage());
             ex.printStackTrace();
@@ -209,7 +239,7 @@ public class DatabaseModification {
                     for (int colNum = 1; colNum <= numColumns; colNum++) {
                         String column = rSet.getString(colNum);
                         if (column != null)
-                            resultString += column + " ";
+                            resultString += column + "\t";
                     }
                     System.out.println(resultString + '\n' +
                             "--------------------------------------------------");
