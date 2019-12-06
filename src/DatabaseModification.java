@@ -1,4 +1,5 @@
 import java.sql.*;
+import java.util.Random;
 
 public class DatabaseModification {
     /**
@@ -20,12 +21,20 @@ public class DatabaseModification {
                 System.out.println("We have connected to our database!");
                 //Create the table and show the table structure
                 Statement stmt = conn.createStatement();
-//                boolean result = stmt.execute("CREATE TABLE Student " +
-//                        "student_ID INT UNSIGNED NOT NULL AUTO_INCREMENT, " +
-//                        "PRIMARY KEY (student_ID), lastName varchar(255)," +
-//                        "age tinyint UNSIGNED, gpa FLOAT (3,2) unsigned");
-//                System.out.println("\tTable creation result: " + result);
-//                DatabaseModification.showColumns(conn);
+
+                String names[] = {"Owen", "Faye", "Colon", "Cesar", "Ruiz", "Norman", "Shane",
+                                    "Francis", "Stanley", "Smith", "Adam", "Griffith", "Gladys"};
+                Random rand = new Random();
+                for(int i=1; i<=10; i++){
+                    String firstName = names[rand.nextInt(names.length)];
+                    String lastName = names[rand.nextInt(names.length)];
+                    PreparedStatement p = conn.prepareStatement("INSERT INTO student.students (firstName, lastName, " +
+                            "studentID, sex) VALUES ('" + firstName + "', '" + lastName + "', '" + i + "', 'M')");
+                    p.executeUpdate();
+                    System.out.println("added stuff");
+                }
+                DatabaseModification.showColumns(conn);
+                DatabaseModification.showValues(conn);
 
                 //Close the database
                 conn.close();
@@ -46,8 +55,8 @@ public class DatabaseModification {
         try
         {
             Statement stmt = conn.createStatement();
-            ResultSet rset = stmt.executeQuery("SELECT * FROM Student");
-            DatabaseModification.showResults("Student", rset);
+            ResultSet rset = stmt.executeQuery("SELECT * FROM student.students");
+            DatabaseModification.showResults("student.students", rset);
         }catch(SQLException ex) {
             System.out.println("SQLException: " + ex.getMessage());
             ex.printStackTrace();
@@ -57,8 +66,8 @@ public class DatabaseModification {
     public static void showColumns(Connection conn) {
         try {
             Statement stmt = conn.createStatement();
-            ResultSet rset = stmt.executeQuery("SHOW COLUMNS FROM Student");
-            DatabaseModification.showResults("Student", rset);
+            ResultSet rset = stmt.executeQuery("SHOW COLUMNS FROM Student.students");
+            DatabaseModification.showResults("Student.students", rset);
         } catch (SQLException ex) {
             System.out.println("SQLException: " + ex.getMessage());
             ex.printStackTrace();
