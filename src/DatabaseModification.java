@@ -1,18 +1,13 @@
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Group;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.scene.canvas.Canvas;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 public class DatabaseModification extends Application {
@@ -38,12 +33,6 @@ public class DatabaseModification extends Application {
                 Statement stmt = conn.createStatement();
 
                 DatabaseModification.populateTables(conn);
-                DatabaseModification.showColumns(conn, "students");
-                DatabaseModification.showColumns(conn, "courses");
-                DatabaseModification.showColumns(conn, "classes");
-                DatabaseModification.showValues(conn, "students");
-                DatabaseModification.showValues(conn, "courses");
-                DatabaseModification.showValues(conn, "classes");
             }
         } catch(SQLException ex){
             System.out.println("SQLException: " + ex.getMessage());
@@ -84,13 +73,6 @@ public class DatabaseModification extends Application {
         root.getChildren().add(canvas);
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
-
-        List<Character> mapKeys = new ArrayList<>(histogramAlphaBet.getCharMap().keySet());
-        List<Double> mapValues = new ArrayList<>(histogramAlphaBet.getCharMap().values());
-
-        for(int i=0; i<mapKeys.size(); i++){
-            System.out.println("(" + mapKeys.get(i) + ", " + mapValues.get(i) + ")");
-        }
 
         //Close the database
         conn.close();
@@ -253,6 +235,21 @@ public class DatabaseModification extends Application {
                         + 2019 + "', 'Fall', '" + GPA + "');");
                 p.executeUpdate();
             }
+
+            int CSc211ClassCode = courseIDSeed;
+            int tally211 = 0;
+            String GPAs211 = "";
+            rset = stmt.executeQuery("SELECT * FROM student.classes");
+            while (rset.next()){
+                int codeToCheck = rset.getInt("courseID");
+                if(codeToCheck == CSc211ClassCode){
+                    tally211++;
+                    GPAs211 +=  " " + rset.getString("GPA");
+                }
+            }
+            System.out.println("There are " + tally211 + " students enrolled in CSc211");
+            System.out.println("GPA of students: " + GPAs211);
+
         }catch(SQLException ex) {
             System.out.println("SQLException: " + ex.getMessage());
             ex.printStackTrace();

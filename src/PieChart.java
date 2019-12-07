@@ -31,7 +31,6 @@ public class PieChart {
 
         for(int i = 0; i < numArcs; i++) {
             startAngle = ((totalValue * 360));
-            System.out.println((drawSource.getCharMap()).get((drawSource.getCharMap()).keySet().toArray()[i]));
             arcAngle = (((drawSource.getCharMap()).get((drawSource.getCharMap()).keySet().toArray()[i]) * 360)+0.7);
             gc.setFill(getRandColor());
             gc.fillArc(60,100,400,400,startAngle,arcAngle, ArcType.ROUND);
