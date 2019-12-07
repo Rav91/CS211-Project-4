@@ -1,8 +1,11 @@
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.scene.canvas.Canvas;
 import java.io.File;
@@ -50,12 +53,14 @@ public class DatabaseModification extends Application {
             ex.printStackTrace();
         }
 
-        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
+        //Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
         primaryStage.setTitle("GPA Pie Chart");
+        Group root = new Group();
         Canvas canvas = new Canvas(900, 600);
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        primaryStage.setScene(new Scene(root));
-        primaryStage.show();
+
+        StackPane pane = new StackPane();
+        pane.getChildren().add(canvas);
 
         Statement stmt = conn.createStatement();
         ResultSet rset = stmt.executeQuery("SELECT * FROM student.classes");
@@ -72,10 +77,13 @@ public class DatabaseModification extends Application {
 
         HistogramAlphaBet histogramAlphaBet = new HistogramAlphaBet();
         histogramAlphaBet.mapFromFile(GPAs);
-        histogramAlphaBet.setCharMap(histogramAlphaBet.sortHashMapByValues(histogramAlphaBet.getCharMap()));
         PieChart chart = new PieChart(canvas.getWidth()/2, canvas.getHeight()/2, canvas.getHeight(),
                 canvas.getWidth(), histogramAlphaBet);
-        chart.draw(gc, 2);
+        chart.draw(gc, 6);
+
+        root.getChildren().add(canvas);
+        primaryStage.setScene(new Scene(root));
+        primaryStage.show();
 
         List<Character> mapKeys = new ArrayList<>(histogramAlphaBet.getCharMap().keySet());
         List<Double> mapValues = new ArrayList<>(histogramAlphaBet.getCharMap().values());

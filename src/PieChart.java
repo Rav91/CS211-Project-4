@@ -31,6 +31,7 @@ public class PieChart {
 
         for(int i = 0; i < numArcs; i++) {
             startAngle = ((totalValue * 360));
+            System.out.println((drawSource.getCharMap()).get((drawSource.getCharMap()).keySet().toArray()[i]));
             arcAngle = (((drawSource.getCharMap()).get((drawSource.getCharMap()).keySet().toArray()[i]) * 360)+0.7);
             gc.setFill(getRandColor());
             gc.fillArc(60,100,400,400,startAngle,arcAngle, ArcType.ROUND);
@@ -41,13 +42,6 @@ public class PieChart {
             yCord += 50;
             y += 50;
         }
-        remainder -= totalValue;
-        startAngle =((totalValue * 360)+ 0.5);
-        arcAngle = ((remainder * 360)+ 0.5);
-        gc.setFill(Color.color(Math.random(), Math.random(), Math.random()));
-        gc.fillArc(60,100,400,400,startAngle,arcAngle,ArcType.ROUND);
-        gc.fillRect(xCord,yCord,50,30);
-        gc.fillText("= other: " + remainder, 560, y);
     }
 
     public Color getRandColor(){

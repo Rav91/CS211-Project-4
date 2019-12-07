@@ -43,9 +43,6 @@ public class HistogramAlphaBet {
         Scanner scanner = new Scanner(file);
         while(scanner.hasNext()){
             char[] line = scanner.nextLine().toUpperCase().toCharArray();
-            for(int i=0; i<line.length; i++){
-                System.out.println("\t" + line[i]);
-            }
             for (Character character : line) {
                 if (Character.isLetter(character)){
                     increment();
@@ -80,8 +77,6 @@ public class HistogramAlphaBet {
                 Character key = keyIt.next();
                 Double comp1 = passedMap.get(key);
                 Double comp2 = val;
-
-                System.out.println(key);
 
                 if (comp1.equals(comp2)) {
                     keyIt.remove();
