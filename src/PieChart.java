@@ -37,7 +37,7 @@ public class PieChart {
             totalValue += (drawSource.getCharMap()).get((drawSource.getCharMap()).keySet().toArray()[i]);
             gc.fillRect(xCord,yCord,50,30);
             gc.fillText("= "+ ((drawSource.getCharMap()).keySet().toArray()[i]) + ": " +
-                    (drawSource.getCharMap()).get((drawSource.getCharMap()).keySet().toArray()[i]), 560, y);
+                    (drawSource.getCharMap()).get((drawSource.getCharMap()).keySet().toArray()[i])*drawSource.getTotal(), 560, y);
             yCord += 50;
             y += 50;
         }

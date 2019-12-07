@@ -6,9 +6,13 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.scene.canvas.Canvas;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.nio.CharBuffer;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Random;
+import java.util.Scanner;
 
 public class DatabaseModification extends Application {
 
@@ -166,21 +170,39 @@ public class DatabaseModification extends Application {
                 p.executeUpdate();
             }
             //add students
-            String names[] = {"Owen", "Faye", "Colon", "Cesar", "Ruiz", "Norman", "Shane",
-                    "Francis", "Stanley", "Smith", "Adam", "Griffith", "Gladys", "Justice",
-                    "Alex", "Charlie", "Skyler", "Armani", "Salem", "Sidney", "Denver",
-                    "Robin", "Campbell", "Yael", "Ramsey", "Murphy", "Perry", "Hollis",
-                    "Jules", "Austin", "Dominique", "Reilly", "Kylar", "Austen", "Storm",
-                    "Ocean", "Summer", "Winter", "Spring", "Autumn", "Indiana", "Nano",
-                    "Marlo", "Ridley", "Ryley", "Riley", "Jaden", "Jayden", "Jackie", "Taylor",
-                    "Taylen", "Lake", "Timber", "Cypress", "Jaziah", "Eastyn", "Easton",
-                    "Payson", "Kylin", "Hollis", "Holis", "Angel", "Blake", "Ruby", "Evan",
-                    "Frankie", "Jean", "Yang", "Sasha",  "Tristan", "Quinn", "Blair",
-                    "August", "May", "Parker", "Hayden", "Halo", "Rio", "Shuten"};
+//            String names[] = {"Owen", "Faye", "Colon", "Cesar", "Ruiz", "Norman", "Shane",
+//                    "Francis", "Stanley", "Smith", "Adam", "Griffith", "Gladys", "Justice",
+//                    "Alex", "Charlie", "Skyler", "Armani", "Salem", "Sidney", "Denver",
+//                    "Robin", "Campbell", "Yael", "Ramsey", "Murphy", "Perry", "Hollis",
+//                    "Jules", "Austin", "Dominique", "Reilly", "Kylar", "Austen", "Storm",
+//                    "Ocean", "Summer", "Winter", "Spring", "Autumn", "Indiana", "Nano",
+//                    "Marlo", "Ridley", "Ryley", "Riley", "Jaden", "Jayden", "Jackie", "Taylor",
+//                    "Taylen", "Lake", "Timber", "Cypress", "Jaziah", "Eastyn", "Easton",
+//                    "Payson", "Kylin", "Hollis", "Holis", "Angel", "Blake", "Ruby", "Evan",
+//                    "Frankie", "Jean", "Yang", "Sasha",  "Tristan", "Quinn", "Blair",
+//                    "August", "May", "Parker", "Hayden", "Halo", "Rio", "Shuten"};
+            ArrayList<String> names = new ArrayList<String>();
+            File getNames = new File("names.txt");
+            Scanner scanner = new Scanner(getNames);
+            while (scanner.hasNext()){
+                names.add(scanner.nextLine());
+            }
             studentIDSeed = (rand.nextInt(5000) + 1000) * 10;
-            for(int i=0; i<27; i++){
-                String firstName = names[rand.nextInt(names.length)];
-                String lastName = names[rand.nextInt(names.length)];
+            PreparedStatement p = conn.prepareStatement("INSERT INTO student.students " +
+                    "(firstName, lastName, studentID, sex) VALUES " +
+                    "('Hashem', 'Auda', '" + studentIDSeed + "', 'M');");
+            p.executeUpdate();
+            p = conn.prepareStatement("INSERT INTO student.students " +
+                    "(firstName, lastName, studentID, sex) VALUES " +
+                    "('Ravid', 'Rahman', '" + (studentIDSeed + 1) + "', 'M');");
+            p.executeUpdate();
+            p = conn.prepareStatement("INSERT INTO student.students " +
+                    "(firstName, lastName, studentID, sex) VALUES " +
+                    "('Kenneth', 'Feng', '" + (studentIDSeed + 2) + "', 'M');");
+            p.executeUpdate();
+            for(int i=3; i<500; i++){
+                String firstName = names.get(rand.nextInt(names.size()));
+                String lastName = names.get(rand.nextInt(names.size()));
                 char gender;
                 int randGender = rand.nextInt(2);
                 if(randGender%2==0){
@@ -188,69 +210,64 @@ public class DatabaseModification extends Application {
                 }else{
                     gender = 'F';
                 }
-                PreparedStatement p = conn.prepareStatement("INSERT INTO student.students " +
+                p = conn.prepareStatement("INSERT INTO student.students " +
                         "(firstName, lastName, studentID, sex) VALUES " +
                         "('" + firstName + "', '" + lastName + "', '" + (studentIDSeed + i) + "', '" + gender + "');");
                 p.executeUpdate();
             }
-            PreparedStatement p = conn.prepareStatement("INSERT INTO student.students " +
-                    "(firstName, lastName, studentID, sex) VALUES " +
-                    "('Hashem', 'Auda', '" + (studentIDSeed + 27) + "', 'M');");
-            p.executeUpdate();
-            p = conn.prepareStatement("INSERT INTO student.students " +
-                    "(firstName, lastName, studentID, sex) VALUES " +
-                    "('Ravid', 'Rahman', '" + (studentIDSeed + 28) + "', 'M');");
-            p.executeUpdate();
-            p = conn.prepareStatement("INSERT INTO student.students " +
-                    "(firstName, lastName, studentID, sex) VALUES " +
-                    "('Kenneth', 'Feng', '" + (studentIDSeed + 29) + "', 'M');");
-            p.executeUpdate();
+            //get all courseIDs to populate classes and get class code for 211
+            ArrayList<Integer> courseIDs = new ArrayList<Integer>();
+            int CSc211ClassCode = 0;
+            rset = stmt.executeQuery("SELECT * FROM student.courses");
+            while (rset.next()){
+                courseIDs.add(rset.getInt("courseID"));
+                String courseName = rset.getString("courseTitle");
+                if(courseName.equals("CSc 211")){
+                    CSc211ClassCode = rset.getInt("courseID");
+                }
+            }
             //add classes
             classIDSeed = (rand.nextInt(50) + 10) * 10;
-            for(int i=0; i<30; i++){
-                char GPA;
-                int randGPA = rand.nextInt(6);
-                switch(randGPA){
-                    case 1:
-                        GPA = 'A';
-                        break;
-                    case 2:
-                        GPA = 'B';
-                        break;
-                    case 3:
-                        GPA = 'C';
-                        break;
-                    case 4:
-                        GPA = 'D';
-                        break;
-                    case 5:
-                        GPA = 'F';
-                        break;
-                    default:
-                        GPA = 'W';
-                }
+            p = conn.prepareStatement("INSERT INTO student.classes " +
+                    "(classCode, courseID, studentID, year, semester, GPA) VALUES " +
+                    "('" + classIDSeed + "', '" + CSc211ClassCode + "', '" + studentIDSeed + "', '"
+                    + 2019 + "', 'Fall', '" + DatabaseModification.getRandGPA() + "');");
+            p.executeUpdate();
+            p = conn.prepareStatement("INSERT INTO student.classes " +
+                    "(classCode, courseID, studentID, year, semester, GPA) VALUES " +
+                    "('" + (classIDSeed + 1) + "', '" + CSc211ClassCode + "', '" + (studentIDSeed + 1) + "', '"
+                    + 2019 + "', 'Fall', '" + DatabaseModification.getRandGPA() + "');");
+            p.executeUpdate();
+            p = conn.prepareStatement("INSERT INTO student.classes " +
+                    "(classCode, courseID, studentID, year, semester, GPA) VALUES " +
+                    "('" + (classIDSeed + 2) + "', '" + CSc211ClassCode + "', '" + (studentIDSeed + 2) + "', '"
+                    + 2019 + "', 'Fall', '" + DatabaseModification.getRandGPA() + "');");
+            p.executeUpdate();
+            for(int i=3; i<500; i++){
+                char GPA = DatabaseModification.getRandGPA();
                 p = conn.prepareStatement("INSERT INTO student.classes " +
                         "(classCode, courseID, studentID, year, semester, GPA) VALUES " +
-                        "('" + (classIDSeed + i) + "', '" + courseIDSeed + "', '" + (studentIDSeed + i) + "', '"
-                        + 2019 + "', 'Fall', '" + GPA + "');");
+                        "('" + (classIDSeed + i) + "', '" + courseIDs.get(rand.nextInt(courseIDs.size())).intValue() + "', '" +
+                        (studentIDSeed + i) + "', '" + 2019 + "', 'Fall', '" + GPA + "');");
                 p.executeUpdate();
             }
 
-            int CSc211ClassCode = courseIDSeed;
             int tally211 = 0;
             String GPAs211 = "";
             rset = stmt.executeQuery("SELECT * FROM student.classes");
             while (rset.next()){
                 int codeToCheck = rset.getInt("courseID");
-                if(codeToCheck == CSc211ClassCode){
+                int yearToCheck = rset.getInt("year");
+                String semesterToCheck = rset.getString("semester");
+                if(codeToCheck == CSc211ClassCode && yearToCheck == 2019 && semesterToCheck.equals("Fall")){
                     tally211++;
                     GPAs211 +=  " " + rset.getString("GPA");
                 }
             }
             System.out.println("There are " + tally211 + " students enrolled in CSc211");
-            System.out.println("GPA of students: " + GPAs211);
+            System.out.println("GPA of students enrolled in the Fall 2019 semester of CSc 211: " + GPAs211);
 
-        }catch(SQLException ex) {
+        }catch(SQLException | FileNotFoundException ex) {
             System.out.println("SQLException: " + ex.getMessage());
             ex.printStackTrace();
         }
@@ -308,6 +325,24 @@ public class DatabaseModification extends Application {
         } catch (SQLException ex){
             System.out.println("SQLException: " + ex.getMessage());
             ex.printStackTrace();
+        }
+    }
+
+    public static char getRandGPA(){
+        Random rand = new Random();
+        int randGPA = rand.nextInt(65) + 40;
+        if(randGPA > 100){
+            return 'W';
+        }else if(randGPA >= 90){
+            return 'A';
+        }else if(randGPA >= 80){
+            return 'B';
+        }else if(randGPA >= 70){
+            return 'C';
+        }else if(randGPA >= 60){
+            return 'D';
+        }else{
+            return 'F';
         }
     }
 }
