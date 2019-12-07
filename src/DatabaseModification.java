@@ -1,13 +1,25 @@
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.stage.Stage;
+import javafx.scene.canvas.Canvas;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
-public class DatabaseModification {
-    /**
-     * Carries out various CRUD operations after
-     * establishing the database connection.
-     */
-    public static void main (String args[]) {
+public class DatabaseModification extends Application {
+
+    @Override
+    public void start(Stage primaryStage) throws Exception{
+
+        File GPAs = new File("GPAs.txt");
         Connection conn = null;
+
         try {
             //Loads the class object for the mysql driver into the DriverManager.
 
@@ -29,32 +41,64 @@ public class DatabaseModification {
                 DatabaseModification.showValues(conn, "students");
                 DatabaseModification.showValues(conn, "courses");
                 DatabaseModification.showValues(conn, "classes");
-                //Close the database
-                conn.close();
             }
-            } catch(SQLException ex){
+        } catch(SQLException ex){
             System.out.println("SQLException: " + ex.getMessage());
             ex.printStackTrace();
         } catch(Exception ex){
             System.out.println("Exception: " + ex.getMessage());
             ex.printStackTrace();
         }
+
+        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
+        primaryStage.setTitle("GPA Pie Chart");
+        Canvas canvas = new Canvas(900, 600);
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        primaryStage.setScene(new Scene(root));
+        primaryStage.show();
+
+        Statement stmt = conn.createStatement();
+        ResultSet rset = stmt.executeQuery("SELECT * FROM student.classes");
+
+        String GPA = "";
+
+        while(rset.next()){
+            GPA += rset.getString("GPA");
+        }
+
+        FileOutputStream outputStream = new FileOutputStream(GPAs);
+        byte[] GPAinBytes = GPA.getBytes();
+        outputStream.write(GPAinBytes);
+
+        HistogramAlphaBet histogramAlphaBet = new HistogramAlphaBet();
+        histogramAlphaBet.mapFromFile(GPAs);
+        histogramAlphaBet.setCharMap(histogramAlphaBet.sortHashMapByValues(histogramAlphaBet.getCharMap()));
+        PieChart chart = new PieChart(canvas.getWidth()/2, canvas.getHeight()/2, canvas.getHeight(),
+                canvas.getWidth(), histogramAlphaBet);
+        chart.draw(gc, 2);
+
+        List<Character> mapKeys = new ArrayList<>(histogramAlphaBet.getCharMap().keySet());
+        List<Double> mapValues = new ArrayList<>(histogramAlphaBet.getCharMap().values());
+
+        for(int i=0; i<mapKeys.size(); i++){
+            System.out.println("(" + mapKeys.get(i) + ", " + mapValues.get(i) + ")");
+        }
+
+        //Close the database
+        conn.close();
+    }
+
+    /**
+     * Carries out various CRUD operations after
+     * establishing the database connection.
+     */
+    public static void main (String args[]) {
+        launch(args);
     }
 
     public static void populateTables(Connection conn){
-        String names[] = {"Owen", "Faye", "Colon", "Cesar", "Ruiz", "Norman", "Shane",
-                "Francis", "Stanley", "Smith", "Adam", "Griffith", "Gladys", "Justice",
-                "Alex", "Charlie", "Skyler", "Armani", "Salem", "Sidney", "Denver",
-                "Robin", "Campbell", "Yael", "Ramsey", "Murphy", "Perry", "Hollis",
-                "Jules", "Austin", "Dominique", "Reilly", "Kylar", "Austen", "Storm",
-                "Ocean", "Summer", "Winter", "Spring", "Autumn", "Indiana", "Nano",
-                "Marlo", "Ridley", "Ryley", "Riley", "Jaden", "Jayden", "Jackie", "Taylor",
-                "Taylen", "Lake", "Timber", "Cypress", "Jaziah", "Eastyn", "Easton",
-                "Payson", "Kylin", "Hollis", "Holis", "Angel", "Blake", "Ruby", "Evan",
-                "Frankie", "Jean", "Yang", "Sasha",  "Tristan", "Quinn", "Blair",
-                "August", "May", "Parker", "Hayden", "Halo", "Rio", "Shuten"};
-        Random rand = new Random();
         try {
+            Random rand = new Random();
             int studentIDSeed;
             int courseIDSeed;
             int classIDSeed;
@@ -132,6 +176,17 @@ public class DatabaseModification {
                 p.executeUpdate();
             }
             //add students
+            String names[] = {"Owen", "Faye", "Colon", "Cesar", "Ruiz", "Norman", "Shane",
+                    "Francis", "Stanley", "Smith", "Adam", "Griffith", "Gladys", "Justice",
+                    "Alex", "Charlie", "Skyler", "Armani", "Salem", "Sidney", "Denver",
+                    "Robin", "Campbell", "Yael", "Ramsey", "Murphy", "Perry", "Hollis",
+                    "Jules", "Austin", "Dominique", "Reilly", "Kylar", "Austen", "Storm",
+                    "Ocean", "Summer", "Winter", "Spring", "Autumn", "Indiana", "Nano",
+                    "Marlo", "Ridley", "Ryley", "Riley", "Jaden", "Jayden", "Jackie", "Taylor",
+                    "Taylen", "Lake", "Timber", "Cypress", "Jaziah", "Eastyn", "Easton",
+                    "Payson", "Kylin", "Hollis", "Holis", "Angel", "Blake", "Ruby", "Evan",
+                    "Frankie", "Jean", "Yang", "Sasha",  "Tristan", "Quinn", "Blair",
+                    "August", "May", "Parker", "Hayden", "Halo", "Rio", "Shuten"};
             studentIDSeed = (rand.nextInt(5000) + 1000) * 10;
             for(int i=0; i<27; i++){
                 String firstName = names[rand.nextInt(names.length)];
@@ -186,7 +241,7 @@ public class DatabaseModification {
                 }
                 p = conn.prepareStatement("INSERT INTO student.classes " +
                         "(classCode, courseID, studentID, year, semester, GPA) VALUES " +
-                        "('" + (classIDSeed + i) + "', '" + courseIDSeed + "', '" + studentIDSeed + i + "', '"
+                        "('" + (classIDSeed + i) + "', '" + courseIDSeed + "', '" + (studentIDSeed + i) + "', '"
                         + 2019 + "', 'Fall', '" + GPA + "');");
                 p.executeUpdate();
             }
