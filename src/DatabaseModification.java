@@ -331,17 +331,24 @@ public class DatabaseModification extends Application {
     public static char getRandGPA(){
         Random rand = new Random();
         int randGPA = rand.nextInt(65) + 40;
+        //105-40
         if(randGPA > 100){
+            //105-101
             return 'W';
-        }else if(randGPA >= 90){
+        }else if(randGPA >= 95){
+            //100-95
             return 'A';
         }else if(randGPA >= 80){
+            //94-80
             return 'B';
-        }else if(randGPA >= 70){
-            return 'C';
         }else if(randGPA >= 60){
+            //79-60
+            return 'C';
+        }else if(randGPA >= 45){
+            //59-45
             return 'D';
         }else{
+            //44-40
             return 'F';
         }
     }
