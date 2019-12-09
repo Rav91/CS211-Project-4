@@ -8,7 +8,6 @@ import javafx.scene.canvas.Canvas;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.nio.CharBuffer;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Random;
@@ -63,13 +62,14 @@ public class DatabaseModification extends Application {
         while(rset.next()){
             GPA += rset.getString("GPA");
         }
-
+        System.out.println("Populating GPA.txt");
         FileOutputStream outputStream = new FileOutputStream(GPAs);
         byte[] GPAinBytes = GPA.getBytes();
         outputStream.write(GPAinBytes);
-
+        System.out.println("Populating HistogramAlphaBet");
         HistogramAlphaBet histogramAlphaBet = new HistogramAlphaBet();
         histogramAlphaBet.mapFromFile(GPAs);
+        System.out.println("Creating PieChart");
         PieChart chart = new PieChart(canvas.getWidth()/2, canvas.getHeight()/2, canvas.getHeight(),
                 canvas.getWidth(), histogramAlphaBet);
         chart.draw(gc, 6);
@@ -98,6 +98,7 @@ public class DatabaseModification extends Application {
             int classIDSeed;
             Statement stmt = conn.createStatement();
             //remove students
+            System.out.println("Clearing previous students");
             ResultSet rset = stmt.executeQuery("SELECT * FROM student.students");
             while(rset.next()){
                 studentIDSeed = rset.getInt("studentID");
@@ -106,6 +107,7 @@ public class DatabaseModification extends Application {
                 p.executeUpdate();
             }
             //remove courses
+            System.out.println("Clearing previous courses");
             rset = stmt.executeQuery("SELECT * FROM student.courses");
             while (rset.next()){
                 courseIDSeed = rset.getInt("courseID");
@@ -114,6 +116,7 @@ public class DatabaseModification extends Application {
                 p.executeUpdate();
             }
             //remove classes
+            System.out.println("Clearing previous classes");
             rset = stmt.executeQuery("SELECT * FROM student.classes");
             while (rset.next()){
                 classIDSeed = rset.getInt("classCode");
@@ -121,7 +124,9 @@ public class DatabaseModification extends Application {
                         "(`classCode` = '" + classIDSeed + "');");
                 p.executeUpdate();
             }
+            System.out.println("All tables cleared");
             //add physics courses
+            System.out.println("Adding Physics Courses");
             courseIDSeed = (rand.nextInt(500) + 100) * 10;
             int n = 0;
             String[] physicsClasses = {"Phys 104", "Phys 105", "Phys 117", "Phys 254", "Phys 255", "Phys 289",
@@ -134,6 +139,7 @@ public class DatabaseModification extends Application {
                 p.executeUpdate();
             }
             //add history courses
+            System.out.println("Adding History Courses");
             courseIDSeed = (rand.nextInt(500) + 100) * 10;
             n = 0;
             String[] historyClasses = {"Hist 109", "Hist 106", "Hist 111", "Hist 229", "Hist 250", "Hist 200",
@@ -146,6 +152,7 @@ public class DatabaseModification extends Application {
                 p.executeUpdate();
             }
             //add math courses
+            System.out.println("Adding Mathematics Courses");
             courseIDSeed = (rand.nextInt(500) + 100) * 10;
             n = 0;
             String[] mathClasses = {"Math 100", "Math 108", "Math 110", "Math 261", "Math 238", "Math 200",
@@ -158,6 +165,7 @@ public class DatabaseModification extends Application {
                 p.executeUpdate();
             }
             //add computer science courses
+            System.out.println("Adding Computer Science Courses");
             courseIDSeed = (rand.nextInt(500) + 1000) * 10;
             n = 0;
             String[] computerScienceClasses = {"CSc 211", "CSc 113", "CSc 101", "CSc 103", "CSc 205", "CSc 216",
@@ -170,17 +178,7 @@ public class DatabaseModification extends Application {
                 p.executeUpdate();
             }
             //add students
-//            String names[] = {"Owen", "Faye", "Colon", "Cesar", "Ruiz", "Norman", "Shane",
-//                    "Francis", "Stanley", "Smith", "Adam", "Griffith", "Gladys", "Justice",
-//                    "Alex", "Charlie", "Skyler", "Armani", "Salem", "Sidney", "Denver",
-//                    "Robin", "Campbell", "Yael", "Ramsey", "Murphy", "Perry", "Hollis",
-//                    "Jules", "Austin", "Dominique", "Reilly", "Kylar", "Austen", "Storm",
-//                    "Ocean", "Summer", "Winter", "Spring", "Autumn", "Indiana", "Nano",
-//                    "Marlo", "Ridley", "Ryley", "Riley", "Jaden", "Jayden", "Jackie", "Taylor",
-//                    "Taylen", "Lake", "Timber", "Cypress", "Jaziah", "Eastyn", "Easton",
-//                    "Payson", "Kylin", "Hollis", "Holis", "Angel", "Blake", "Ruby", "Evan",
-//                    "Frankie", "Jean", "Yang", "Sasha",  "Tristan", "Quinn", "Blair",
-//                    "August", "May", "Parker", "Hayden", "Halo", "Rio", "Shuten"};
+            System.out.println("Adding Students");
             ArrayList<String> names = new ArrayList<String>();
             File getNames = new File("names.txt");
             Scanner scanner = new Scanner(getNames);
@@ -216,6 +214,7 @@ public class DatabaseModification extends Application {
                 p.executeUpdate();
             }
             //get all courseIDs to populate classes and get class code for 211
+            System.out.println("Adding Classes");
             ArrayList<Integer> courseIDs = new ArrayList<Integer>();
             int CSc211ClassCode = 0;
             rset = stmt.executeQuery("SELECT * FROM student.courses");
@@ -243,15 +242,40 @@ public class DatabaseModification extends Application {
                     "('" + (classIDSeed + 2) + "', '" + CSc211ClassCode + "', '" + (studentIDSeed + 2) + "', '"
                     + 2019 + "', 'Fall', '" + DatabaseModification.getRandGPA() + "');");
             p.executeUpdate();
-            for(int i=3; i<500; i++){
-                char GPA = DatabaseModification.getRandGPA();
-                p = conn.prepareStatement("INSERT INTO student.classes " +
-                        "(classCode, courseID, studentID, year, semester, GPA) VALUES " +
-                        "('" + (classIDSeed + i) + "', '" + courseIDs.get(rand.nextInt(courseIDs.size())).intValue() + "', '" +
-                        (studentIDSeed + i) + "', '" + 2019 + "', 'Fall', '" + GPA + "');");
-                p.executeUpdate();
+//            for(int i=3; i<500; i++){
+//                char GPA = DatabaseModification.getRandGPA();
+//                p = conn.prepareStatement("INSERT INTO student.classes " +
+//                        "(classCode, courseID, studentID, year, semester, GPA) VALUES " +
+//                        "('" + (classIDSeed + i) + "', '" + courseIDs.get(rand.nextInt(courseIDs.size())).intValue() + "', '" +
+//                        (studentIDSeed + i) + "', '" + 2019 + "', 'Fall', '" + GPA + "');");
+//                p.executeUpdate();
+//            }
+            ArrayList<Integer> studentIDs = new ArrayList<Integer>();
+            rset = stmt.executeQuery("SELECT * FROM student.students");
+            while (rset.next()){
+                studentIDs.add(rset.getInt("studentID"));
             }
-
+            classIDSeed+=2;
+            for(int i=0; i<studentIDs.size(); i++){
+                for (int j=0; j<20; j++){
+                    classIDSeed++;
+                    String semester;
+                    int randSemester = rand.nextInt(2);
+                    if(randSemester%2==0){
+                        semester = "Spring";
+                    }else{
+                        semester = "Fall";
+                    }
+                    char GPA = DatabaseModification.getRandGPA();
+                    p = conn.prepareStatement("INSERT INTO student.classes " +
+                            "(classCode, courseID, studentID, year, semester, GPA) VALUES " +
+                            "('" + (classIDSeed) + "', '" + courseIDs.get(rand.nextInt(courseIDs.size())).intValue() + "', '" +
+                            studentIDs.get(i).intValue() + "', '" + (rand.nextInt(10) + 2010) + "', '" + semester + "', '" + GPA + "');");
+                    p.executeUpdate();
+                }
+            }
+            System.out.println("All tables populated");
+            System.out.println("Fetching data for CSc 211");
             int tally211 = 0;
             String GPAs211 = "";
             rset = stmt.executeQuery("SELECT * FROM student.classes");
@@ -264,15 +288,15 @@ public class DatabaseModification extends Application {
                     GPAs211 +=  " " + rset.getString("GPA");
                 }
             }
-            System.out.println("There are " + tally211 + " students enrolled in CSc211");
-            System.out.println("GPA of students enrolled in the Fall 2019 semester of CSc 211: " + GPAs211);
+            System.out.println("\tThere are " + tally211 + " students enrolled in CSc211");
+            System.out.println("\tGPA of students enrolled in the Fall 2019 semester of CSc 211: " + GPAs211);
 
         }catch(SQLException | FileNotFoundException ex) {
             System.out.println("SQLException: " + ex.getMessage());
             ex.printStackTrace();
         }
     }
-    /**
+    /**illll
      * Obtains and displays a ResultSet from the Student table.
      */
     public static void showValues(Connection conn, String column) {
