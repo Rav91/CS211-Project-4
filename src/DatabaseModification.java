@@ -70,8 +70,8 @@ public class DatabaseModification extends Application {
         HistogramAlphaBet histogramAlphaBet = new HistogramAlphaBet();
         histogramAlphaBet.mapFromFile(GPAs);
         System.out.println("Creating PieChart");
-        PieChart chart = new PieChart(canvas.getWidth()/2, canvas.getHeight()/2, canvas.getHeight(),
-                canvas.getWidth(), histogramAlphaBet);
+        PieChart chart = new PieChart(canvas.getWidth()/8, canvas.getHeight()/4, canvas.getHeight()/2,
+                canvas.getHeight()/2, histogramAlphaBet);
         chart.draw(gc, 6);
 
         root.getChildren().add(canvas);
@@ -296,7 +296,7 @@ public class DatabaseModification extends Application {
             ex.printStackTrace();
         }
     }
-    /**illll
+    /**
      * Obtains and displays a ResultSet from the Student table.
      */
     public static void showValues(Connection conn, String column) {
