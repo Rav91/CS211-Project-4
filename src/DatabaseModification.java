@@ -27,7 +27,7 @@ public class DatabaseModification extends Application {
             Class.forName("com.mysql.cj.jdbc.Driver");
 
             //Attempt to establish a connection to the specified database via the DriverManager.
-            conn = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/", "root", "@MySQL99");
+            conn = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/", "root", "kekw");
 
             //Check the connection
             if(conn != null) {
